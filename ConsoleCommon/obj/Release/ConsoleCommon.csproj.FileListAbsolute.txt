@@ -1,2 +1,6 @@
 C:\Users\yisraellax\OneDrive\CJPM\Reois\uscis_tools\ConsoleCommon\ConsoleCommon\obj\Release\ConsoleCommon.csprojResolveAssemblyReference.cache
+C:\GitHub\ConsoleCommon\ConsoleCommon\bin\Release\ConsoleCommon.pdb
+C:\GitHub\ConsoleCommon\ConsoleCommon\obj\Release\ConsoleCommon.pdb
 C:\GitHub\ConsoleCommon\ConsoleCommon\obj\Release\ConsoleCommon.csprojResolveAssemblyReference.cache
+C:\GitHub\ConsoleCommon\ConsoleCommon\bin\Release\ConsoleCommon.dll
+C:\GitHub\ConsoleCommon\ConsoleCommon\obj\Release\ConsoleCommon.dll

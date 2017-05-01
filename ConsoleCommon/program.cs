@@ -2,46 +2,118 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using ConsoleCommon.Models;
-using ConsoleCommon.Models.Example;
 
 namespace ConsoleCommon
 {
+    /// <summary>
+    /// This is an example program
+    /// To run this, modify the <OutputType> tag in the .csproj file from "Library" to "Exe".
+    /// </summary>
     public static class program
     {
-        public static void Main(string[] args)
+        class Program
         {
-            //args = new string[] { "10/1/2016", "10/31/2016", "TFS_HISTORY", "$/USCIS/Releases/R22.0.0/Source/JPMC.TSS.USCIS.IntegrationServicesJava" };
-            //args = new string[] { "/FRM:10/1/2016", "/TO:10/31/2016", "/SRC:TFS_History", "/U:Y", "/PTH:$/USCIS/Releases/R22.0.0/Source/JPMC.TSS.USCIS.IntegrationServicesJava" };
-            //args=new string[] {"/FRM:10/1/2016,4/4/2017", "/TO:10/31/2016", "/SRC:TFS_History", "/U:Y", "/PTH:$/USCIS/Releases/R22.0.0/Source/JPMC.TSS.USCIS.IntegrationServicesJava" };
-            args = new string[] { "/SRC:TFS_ITSM", "/StartDate:09/01/2016", "/EndDate:10/01/2016", "/Path:$/USCIS/Releases/R22.0.0", "/WorkspacePath:C:\\testagain", "/UserID:/E189382", "/Password:TYPE THE PASSWORD HERE" };
-            //args=new string[] {"10/1/2016", "10/31/2016", "TFS_History", "$/USCIS/Releases/R22.0.0/Source/JPMC.TSS.USCIS.IntegrationServicesJava" };
-            //args = new string[] { "/help" };
-            try
+            static void Main(string[] args)
             {
-                //SourceControlHistoryParams myParams = ConsoleTools.CheckParams<SourceControlHistoryParams>(args);
-                ExampleSourceControlParams myParams = new ExampleSourceControlParams(args);
-                myParams.CheckParams();
-                string _help = myParams.GetHelpIfNeeded();
-                //string _help = myParams.GetHelp2();
-                if (_help != string.Empty)
+                try
                 {
-                    Console.Write(_help);
-                }
-                else
-                {
-                    foreach (var switchVal in myParams.SwitchValues)
+                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987" };
+                    //This step will do type validation
+                    //and automatically cast the string args to a strongly typed object:
+                    CustomerParamsObject _customer = new CustomerParamsObject(args);
+                    //This step does additional validation
+                    _customer.CheckParams();
+                    //Get help if user requested it
+                    string _helptext = _customer.GetHelpIfNeeded();
+                    //Print help to console if requested
+                    if (!string.IsNullOrEmpty(_helptext))
                     {
-                        Console.WriteLine("{0}: {1}", switchVal.Key, switchVal.Value);
+                        Console.WriteLine(_helptext);
+                        Environment.Exit(0);
                     }
+                    string _fname = _customer.firstName;
+                    string _lname = _customer.lastName.ToString();
+                    string _dob = _customer.DOB.ToString("MM-dd-yyyy");
+                    string _ctype = _customer.CustomerType == null ? "None" : _customer.CustomerType.Name;
+
+                    Console.WriteLine();
+                    Console.WriteLine("First Name: {0}", _fname);
+                    Console.WriteLine("Last Name: {0}", _lname);
+                    Console.WriteLine("DOB: {0}", _dob);
+                    Console.WriteLine("Customer Type: {0}", _ctype);
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                Console.ReadKey();
             }
-            catch(Exception ex)
+        }
+
+        [TypeParam("pizza shop")]
+        public class PizzaShopCustomer { }
+        [TypeParam("bodega")]
+        public class BodegaCustomer { }
+
+        public enum LastNameEnum
+        {
+            Smith,
+            Johnson,
+            Nixon,
+            Lax
+        }
+        public class CustomerParamsObject : ParamsObject
+        {
+            public CustomerParamsObject(string[] args)
+                : base(args)
             {
-                Console.WriteLine(ex.Message);
+
             }
-            Console.ReadKey();
+
+            #region Switch Properties
+            [Switch("F", true, 1)]
+            [SwitchHelpText("First name of customer")]
+            public string firstName { get; set; }
+            [Switch("L", true, 2)]
+            [SwitchHelpText("Last name of customer")]
+            public LastNameEnum lastName { get; set; }
+            [SwitchHelpText("The date of birth of customer")]
+            [Switch("DOB", false, 3)]
+            public DateTime DOB { get; set; }
+            [Switch("T", false, 4)]
+            public Type CustomerType { get; set; }
+            #endregion
+
+            public override Dictionary<Func<bool>, string> GetParamExceptionDictionary()
+            {
+                Dictionary<Func<bool>, string> _exceptionChecks = new Dictionary<Func<bool>, string>();
+
+                Func<bool> _isDateInFuture = new Func<bool>(() => DateTime.Now <= this.DOB);
+
+                _exceptionChecks.Add(_isDateInFuture, "Please choose a date of birth that is not in the future!");
+                return _exceptionChecks;
+            }
+
+            [HelpText(0)]
+            public string Description
+            {
+                get { return "Finds a customer in the database."; }
+            }
+            [HelpText(1, "Example")]
+            public string ExampleText
+            {
+                get { return "This is an example: CustomerFinder.exe Yisrael Lax 11-28-1987"; }
+            }
+            [HelpText(2)]
+            public override string Usage
+            {
+                get { return base.Usage; }
+            }
+            [HelpText(3, "Parameters")]
+            public override string SwitchHelp
+            {
+                get { return base.SwitchHelp; }
+            }
         }
     }
 }

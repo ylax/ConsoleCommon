@@ -52,8 +52,6 @@
     <Compile Include="HelpTextAttribute.cs" />
     <Compile Include="ParamsObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ExampleParamsObject.cs" />
-    <Compile Include="SourceControlType.cs" />
     <Compile Include="SwitchAttribute.cs" />
     <Compile Include="program.cs" />
     <Compile Include="SwitchHelpTextAttribute.cs" />
