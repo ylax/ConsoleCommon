@@ -18,7 +18,7 @@ namespace ConsoleCommon
             {
                 try
                 {
-                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987", "/Case" };
+                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987", "/Case", "/Regions:Northeast,Central", "/Int:Pizza,Parachuting" };
                     //This step will do type validation
                     //and automatically cast the string args to a strongly typed object:
                     CustomerParamsObject _customer = new CustomerParamsObject(args);
@@ -37,6 +37,8 @@ namespace ConsoleCommon
                     string _dob = _customer.DOB.ToString("MM-dd-yyyy");
                     string _ctype = _customer.CustomerType == null ? "None" : _customer.CustomerType.Name;
                     string _caseSensitive = _customer.CaseSensitiveSearch ? "Yes" : "No";
+                    string _regions = string.Concat(_customer.CustRegions.Select(r => "," + r.ToString())).Substring(1);
+                    string _interests = _interests = _customer.Interests.ToString();
 
                     Console.WriteLine();
                     Console.WriteLine("First Name: {0}", _fname);
@@ -44,6 +46,8 @@ namespace ConsoleCommon
                     Console.WriteLine("DOB: {0}", _dob);
                     Console.WriteLine("Customer Type: {0}", _ctype);
                     Console.WriteLine("Case sensitive: {0}", _caseSensitive);
+                    Console.WriteLine("Regions: {0}", _regions);
+                    Console.WriteLine("Interests: {0}", _interests);
 
                     //Get help
                     args = new string[1] { "/?" };
@@ -62,6 +66,24 @@ namespace ConsoleCommon
                 }
                 Console.ReadKey();
             }
+        }
+
+        public enum CustomerRegion
+        {
+            None,
+            Northeast,
+            Southwest,
+            Central,
+            Midwest
+        }
+
+        [Flags]
+        public enum CustomerInterests
+        {
+            Pizza = 1,
+            Crabcakes = 2,
+            Parachuting = 4,
+            Biking = 8
         }
 
         [TypeParam("pizza shop")]
@@ -104,6 +126,14 @@ namespace ConsoleCommon
             [Switch("Case")]
             [SwitchHelpText("Specifies whether to do a case sensitive search")]
             public bool CaseSensitiveSearch { get; set; }
+
+            [Switch("Regions")]
+            [SwitchHelpText("Specifies the regions the customer does business in")]
+            public CustomerRegion[] CustRegions { get; set; }
+
+            [Switch("Int")]
+            [SwitchHelpText("Specifies customer's interests")]
+            public CustomerInterests Interests { get; set; }
             #endregion
 
             #region Other Functions

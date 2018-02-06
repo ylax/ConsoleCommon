@@ -19,7 +19,8 @@ namespace ConsoleCommon.Parsing
         {
             Type elementType = type.GetElementType();
             //Comma delimited, space delimited, or comma+space delimited
-            string[] splits = toParse.Split(new string[] { ", ", ",", " " }, StringSplitOptions.None);
+            string[] splits = toParse.Split(new string[] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            splits = splits.Select(s => s.Trim()).ToArray();
             Type[] myTypes = new Type[] { typeof(int) };
             object[] myReqs = new object[] { splits.Length };
 
@@ -34,6 +35,7 @@ namespace ConsoleCommon.Parsing
             }
             return returnVals;
         }
+        bool _parseEnumAsArray = false;
         public object ParseElement(string toParse, Type type)
         {
             object myVal = null;
@@ -48,7 +50,27 @@ namespace ConsoleCommon.Parsing
             }
             if (myUnderLyingType.IsEnum)
             {
-                myVal = Enum.Parse(myUnderLyingType, toParse, true);
+                if(!_parseEnumAsArray && myUnderLyingType.GetCustomAttribute<FlagsAttribute>()!=null)
+                {
+                    _parseEnumAsArray = true;
+                    Type _enumArrayType = myUnderLyingType.MakeArrayType();
+                    Array _enumArray = ParseArray(toParse, _enumArrayType) as Array;
+                    int _totalVal = 0;
+                    int _iter = 0;
+                    
+                    foreach (object enVal in _enumArray)
+                    {
+                        if (_iter == 0) _totalVal = (int)enVal;
+                        else
+                        {
+                            _totalVal = _totalVal | (int)enVal;
+                        }
+                        _iter++;
+                    }
+                    myVal = _totalVal;
+                    _parseEnumAsArray = false;
+                }
+                else myVal = Enum.Parse(myUnderLyingType, toParse, true);
             }
             else if (typeof(System.Security.SecureString).Equals(myUnderLyingType))
             {
