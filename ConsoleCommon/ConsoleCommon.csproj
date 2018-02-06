@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -47,15 +50,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\InputParameterType.cs" />
+    <Compile Include="Entities\SwitchOptions.cs" />
+    <Compile Include="Entities\SwitchParameterEntity.cs" />
+    <Compile Include="HelpText\BasicHelpTextParser.cs" />
+    <Compile Include="HelpText\IHelpTextOptions.cs" />
+    <Compile Include="HelpText\IHelpTextParser.cs" />
+    <Compile Include="Parsing\ISwitchParser.cs" />
+    <Compile Include="Parsing\ITypeParser.cs" />
+    <Compile Include="Parsing\PrimitiveParser.cs" />
+    <Compile Include="Parsing\SwitchParser.cs" />
     <Compile Include="ReflectionExtensionMethods.cs" />
-    <Compile Include="StringToPrimitiveParser.cs" />
-    <Compile Include="HelpTextAttribute.cs" />
+    <Compile Include="HelpText\HelpTextAttribute.cs" />
     <Compile Include="ParamsObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwitchAttribute.cs" />
     <Compile Include="program.cs" />
-    <Compile Include="SwitchHelpTextAttribute.cs" />
-    <Compile Include="SwitchProperty.cs" />
+    <Compile Include="HelpText\SwitchHelpTextAttribute.cs" />
     <Compile Include="TypeParamAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

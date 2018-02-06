@@ -69,5 +69,9 @@ namespace ConsoleCommon
                 throw new Exception("Error while reflecting", ex);
             }
         }
+        public static PropertyInfo GetPropertyByAttribute(this object src, Attribute attr)
+        {
+            return src.GetType().GetProperties().Where(pi => pi.GetCustomAttributes(true).Contains(attr)).FirstOrDefault();
+        }
     }
 }

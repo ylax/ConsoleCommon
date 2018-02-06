@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleCommon.Parsing;
 
 namespace ConsoleCommon
 {
@@ -41,6 +42,17 @@ namespace ConsoleCommon
                     Console.WriteLine("Last Name: {0}", _lname);
                     Console.WriteLine("DOB: {0}", _dob);
                     Console.WriteLine("Customer Type: {0}", _ctype);
+
+                    //Get help
+                    args = new string[1] { "/?" };
+                    _customer = new CustomerParamsObject(args);
+                    _customer.CheckParams();
+                    _helptext = _customer.GetHelpIfNeeded();
+                    //Print help to console if requested
+                    if (!string.IsNullOrEmpty(_helptext))
+                    {
+                        Console.WriteLine(_helptext);
+                    }
                 }
                 catch (Exception ex)
                 {
