@@ -18,7 +18,7 @@ namespace ConsoleCommon
             {
                 try
                 {
-                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987" };
+                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987", "/Case" };
                     //This step will do type validation
                     //and automatically cast the string args to a strongly typed object:
                     CustomerParamsObject _customer = new CustomerParamsObject(args);
@@ -36,12 +36,14 @@ namespace ConsoleCommon
                     string _lname = _customer.lastName.ToString();
                     string _dob = _customer.DOB.ToString("MM-dd-yyyy");
                     string _ctype = _customer.CustomerType == null ? "None" : _customer.CustomerType.Name;
+                    string _caseSensitive = _customer.CaseSensitiveSearch ? "Yes" : "No";
 
                     Console.WriteLine();
                     Console.WriteLine("First Name: {0}", _fname);
                     Console.WriteLine("Last Name: {0}", _lname);
                     Console.WriteLine("DOB: {0}", _dob);
                     Console.WriteLine("Customer Type: {0}", _ctype);
+                    Console.WriteLine("Case sensitive: {0}", _caseSensitive);
 
                     //Get help
                     args = new string[1] { "/?" };
@@ -86,16 +88,25 @@ namespace ConsoleCommon
             [Switch("F", true, 1)]
             [SwitchHelpText("First name of customer")]
             public string firstName { get; set; }
+
             [Switch("L", true, 2)]
             [SwitchHelpText("Last name of customer")]
             public LastNameEnum lastName { get; set; }
+
             [SwitchHelpText("The date of birth of customer")]
             [Switch("DOB", false, 3)]
             public DateTime DOB { get; set; }
+
             [Switch("T", false, 4)]
+            [SwitchHelpText("Customer type")]
             public Type CustomerType { get; set; }
+
+            [Switch("Case")]
+            [SwitchHelpText("Specifies whether to do a case sensitive search")]
+            public bool CaseSensitiveSearch { get; set; }
             #endregion
 
+            #region Other Functions
             public override Dictionary<Func<bool>, string> GetParamExceptionDictionary()
             {
                 Dictionary<Func<bool>, string> _exceptionChecks = new Dictionary<Func<bool>, string>();
@@ -126,6 +137,7 @@ namespace ConsoleCommon
             {
                 get { return base.SwitchHelp; }
             }
+            #endregion
         }
     }
 }

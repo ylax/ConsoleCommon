@@ -39,7 +39,7 @@ namespace ConsoleCommon.Parsing
             object myVal = null;
             Type myPropType = type;
             Type myUnderLyingType = myPropType;
-            toParse = toParse.ToLower();
+            if (toParse != null) toParse = toParse.ToLower();
             bool isNullable = myPropType.IsGenericType && myPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             if (isNullable)
@@ -64,18 +64,13 @@ namespace ConsoleCommon.Parsing
             {
                 if (myUnderLyingType == typeof(bool))
                 {
-                    switch (toParse)
+                    if(BoolFalseValues.Contains(toParse))
                     {
-                        case "y":
-                        case "yes":
-                            myVal = true;
-                            break;
-                        case "n":
-                        case "no":
-                            myVal = false;
-                            break;
-                        default:
-                            break;
+                        return false;
+                    }
+                    else if(BoolTrueValues.Contains(toParse))
+                    {
+                        return true;
                     }
                 }
                 else myVal = Convert.ChangeType(toParse, myUnderLyingType);
@@ -89,6 +84,20 @@ namespace ConsoleCommon.Parsing
                                     .Where(t => t.MatchesAttributeValueOrName<TypeParamAttribute>(toParse, attr => (attr == null || string.IsNullOrWhiteSpace(attr.FriendlyName)) ? "" : attr.FriendlyName.ToLower())).FirstOrDefault();
             }
             return myVal;
+        }
+        private string[] BoolFalseValues
+        {
+            get
+            {
+                return new string[] { "n", "no", "false", "f", "off" };
+            }
+        }
+        private string[] BoolTrueValues
+        {
+            get
+            {
+                return new string[] { "y", "yes", "true", "t", "on", null };
+            }
         }
         public string[] GetAcceptedValues(Type type)
         {
@@ -110,7 +119,7 @@ namespace ConsoleCommon.Parsing
         }
         private string[] GetBoolAcceptedValues()
         {
-            return new string[] { "Y", "N", "YES", "NO" };
+            return BoolFalseValues.Where(s=>s!=null).Concat(BoolTrueValues.Where(s=>s!=null)).ToArray();
         }
         private string[] GetEnumAcceptedValues(Type enumType)
         {
