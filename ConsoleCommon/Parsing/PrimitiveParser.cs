@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,15 +8,38 @@ namespace ConsoleCommon.Parsing
 {
     public class PrimitiveParser : ITypeParser
     {
+        #region Implementation
         public object Parse(string toParse, Type type)
         {
+            if (type.IsInterface) throw new Exception("Cannot parse interfaces. Must use concrete types");
             if (type.IsArray)
             {
                 return ParseArray(toParse, type);
             }
             else return ParseElement(toParse, type);
         }
-        public object ParseArray(string toParse, Type type)
+        public string[] GetAcceptedValues(Type type)
+        {
+            string[] _acceptedVals = new string[0];
+            Type myUnderLyingType = type;
+            if (type.IsArray) myUnderLyingType = type.GetElementType();
+            bool isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            if (isNullable) myUnderLyingType = Nullable.GetUnderlyingType(myUnderLyingType);
+
+            if (myUnderLyingType.IsAssignableFrom(typeof(bool)))
+            {
+                _acceptedVals = GetBoolAcceptedValues();
+            }
+            else if (myUnderLyingType.IsEnum)
+            {
+                _acceptedVals = GetEnumAcceptedValues(myUnderLyingType);
+            }
+            return _acceptedVals;
+        }
+        #endregion
+
+        #region Parse Methods
+        private object ParseArray(string toParse, Type type)
         {
             Type elementType = type.GetElementType();
             //Comma delimited, space delimited, or comma+space delimited
@@ -35,8 +59,7 @@ namespace ConsoleCommon.Parsing
             }
             return returnVals;
         }
-        bool _parseEnumAsArray = false;
-        public object ParseElement(string toParse, Type type)
+        private object ParseElement(string toParse, Type type)
         {
             object myVal = null;
             Type myPropType = type;
@@ -50,14 +73,14 @@ namespace ConsoleCommon.Parsing
             }
             if (myUnderLyingType.IsEnum)
             {
-                if(!_parseEnumAsArray && myUnderLyingType.GetCustomAttribute<FlagsAttribute>()!=null)
+                if (!_parseEnumAsArray && myUnderLyingType.GetCustomAttribute<FlagsAttribute>() != null)
                 {
                     _parseEnumAsArray = true;
                     Type _enumArrayType = myUnderLyingType.MakeArrayType();
                     Array _enumArray = ParseArray(toParse, _enumArrayType) as Array;
                     int _totalVal = 0;
                     int _iter = 0;
-                    
+
                     foreach (object enVal in _enumArray)
                     {
                         if (_iter == 0) _totalVal = (int)enVal;
@@ -82,15 +105,26 @@ namespace ConsoleCommon.Parsing
                 }
                 myVal = secure;
             }
+            else if(typeof(KeyValuePair<,>).Name.Equals(myUnderLyingType.Name))
+            {
+                Type[] _genericTypes = myUnderLyingType.GetGenericArguments();
+                string[] _keyValArr = toParse.Split(':');
+                if (_keyValArr == null || _keyValArr.Length != 2) throw new Exception("Failed to parse key value pair");
+                object _key = Parse(_keyValArr[0], _genericTypes[0]);
+                object _val = Parse(_keyValArr[1], _genericTypes[1]);
+                if (_key == null || _val == null) throw new Exception("Failed to parse key value pair");
+                object[] _keyValPair = new object[] { _key, _val };
+                myVal = myUnderLyingType.GetConstructor(_genericTypes).Invoke(_keyValPair);
+            }
             else if (typeof(IConvertible).IsAssignableFrom(myUnderLyingType))
             {
                 if (myUnderLyingType == typeof(bool))
                 {
-                    if(BoolFalseValues.Contains(toParse))
+                    if (BoolFalseValues.Contains(toParse))
                     {
                         return false;
                     }
-                    else if(BoolTrueValues.Contains(toParse))
+                    else if (BoolTrueValues.Contains(toParse))
                     {
                         return true;
                     }
@@ -107,6 +141,13 @@ namespace ConsoleCommon.Parsing
             }
             return myVal;
         }
+        #endregion
+
+        #region Private Fields
+        bool _parseEnumAsArray = false;
+        #endregion
+
+        #region Helper Methods
         private string[] BoolFalseValues
         {
             get
@@ -121,24 +162,7 @@ namespace ConsoleCommon.Parsing
                 return new string[] { "y", "yes", "true", "t", "on", null };
             }
         }
-        public string[] GetAcceptedValues(Type type)
-        {
-            string[] _acceptedVals = new string[0];
-            Type myUnderLyingType = type;
-            if (type.IsArray) myUnderLyingType = type.GetElementType();
-            bool isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-            if (isNullable) myUnderLyingType = Nullable.GetUnderlyingType(myUnderLyingType);
-
-            if (myUnderLyingType.IsAssignableFrom(typeof(bool)))
-            {
-                _acceptedVals = GetBoolAcceptedValues();
-            }
-            else if (myUnderLyingType.IsEnum)
-            {
-                _acceptedVals = GetEnumAcceptedValues(myUnderLyingType);
-            }
-            return _acceptedVals;
-        }
+        
         private string[] GetBoolAcceptedValues()
         {
             return BoolFalseValues.Where(s=>s!=null).Concat(BoolTrueValues.Where(s=>s!=null)).ToArray();
@@ -147,5 +171,6 @@ namespace ConsoleCommon.Parsing
         {
             return Enum.GetNames(enumType);
         }
+        #endregion
     }
 }

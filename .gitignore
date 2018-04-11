@@ -4,3 +4,23 @@
 
 /ConsoleCommon/bin/Debug
 /.vs/ConsoleCommon/v14
+/ConsoleCommon/bin/Release/root
+/ConsoleCommon/bin/Release/root/lib/net45
+/ConsoleCommon/bin/Release/root
+/ConsoleCommon/bin/Release/ConsoleCommon.dll.2.0.0.nupkg
+/ConsoleCommon/bin/Release/ConsoleCommon.dll.zip
+/ConsoleCommon/bin/Release/ConsoleCommon.exe
+/ConsoleCommon/bin/Release/ConsoleCommon.pdb
+*.cache
+*.exe
+*.pdb
+/ConsoleCommon/ConsoleCommon.nuspec
+*.nupkg
+*.zip
+/packages/NuGet.CommandLine.4.5.1
+/ConsoleCommon.source.zip
+/manifest.nuspec
+/packages/NuGet.CommandLine.4.5.1
+/packages/NuGet.CommandLine.4.5.1
+/manifest.nuspec
+*.dll

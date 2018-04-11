@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleCommon.Entities;
 using ConsoleCommon.Parsing;
 
 namespace ConsoleCommon
@@ -18,7 +19,7 @@ namespace ConsoleCommon
             {
                 try
                 {
-                    args = new string[] { "Yisrael", "Lax", "/T:pizza shop", "/DOB:11-28-1987", "/Case", "/Regions:Northeast,Central", "/Int:Pizza,Parachuting" };
+                    args = new string[] { "Yisrael", "Lax", "/Int:Pizza,Parachuting", "/Pets:dog:5,cat:3,bird:1" };//"/T:pizza shop", "/DOB:11-28-1987", "/Case", "/Regions:Northeast,Central" };
                     //This step will do type validation
                     //and automatically cast the string args to a strongly typed object:
                     CustomerParamsObject _customer = new CustomerParamsObject(args);
@@ -37,8 +38,9 @@ namespace ConsoleCommon
                     string _dob = _customer.DOB.ToString("MM-dd-yyyy");
                     string _ctype = _customer.CustomerType == null ? "None" : _customer.CustomerType.Name;
                     string _caseSensitive = _customer.CaseSensitiveSearch ? "Yes" : "No";
-                    string _regions = string.Concat(_customer.CustRegions.Select(r => "," + r.ToString())).Substring(1);
-                    string _interests = _interests = _customer.Interests.ToString();
+                    string _regions = _customer.CustRegions == null ? "None" : string.Concat(_customer.CustRegions.Select(r => "," + r.ToString())).Substring(1);
+                    string _interests = _customer.Interests.ToString();
+                    string _petCount = _customer.PetCount == null || _customer.PetCount.Length == 0 ? "None" : string.Concat(_customer.PetCount.Select(pc => ", " + pc.Key + ": " + pc.Value)).Substring(2);
 
                     Console.WriteLine();
                     Console.WriteLine("First Name: {0}", _fname);
@@ -48,6 +50,7 @@ namespace ConsoleCommon
                     Console.WriteLine("Case sensitive: {0}", _caseSensitive);
                     Console.WriteLine("Regions: {0}", _regions);
                     Console.WriteLine("Interests: {0}", _interests);
+                    Console.WriteLine("Pet count: {0}", _petCount);
 
                     //Get help
                     args = new string[1] { "/?" };
@@ -103,7 +106,6 @@ namespace ConsoleCommon
             public CustomerParamsObject(string[] args)
                 : base(args)
             {
-
             }
 
             #region Switch Properties
@@ -134,9 +136,13 @@ namespace ConsoleCommon
             [Switch("Int")]
             [SwitchHelpText("Specifies customer's interests")]
             public CustomerInterests Interests { get; set; }
+
+            [Switch("Pets")]
+            public KeyValuePair<string,int>[] PetCount { get; set; }
             #endregion
 
             #region Other Functions
+
             public override Dictionary<Func<bool>, string> GetParamExceptionDictionary()
             {
                 Dictionary<Func<bool>, string> _exceptionChecks = new Dictionary<Func<bool>, string>();

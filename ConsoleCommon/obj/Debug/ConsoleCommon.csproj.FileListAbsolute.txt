@@ -1,1 +1,4 @@
-C:\GitHub\ConsoleCommon\ConsoleCommon\obj\Debug\ConsoleCommon.csprojResolveAssemblyReference.cache
+C:\Projects\ConsoleCommon\ConsoleCommon\bin\Debug\ConsoleCommon.exe
+C:\Projects\ConsoleCommon\ConsoleCommon\bin\Debug\ConsoleCommon.pdb
+C:\Projects\ConsoleCommon\ConsoleCommon\obj\Debug\ConsoleCommon.exe
+C:\Projects\ConsoleCommon\ConsoleCommon\obj\Debug\ConsoleCommon.pdb
