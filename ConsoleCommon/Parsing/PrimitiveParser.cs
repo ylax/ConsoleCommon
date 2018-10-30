@@ -64,7 +64,7 @@ namespace ConsoleCommon.Parsing
             object myVal = null;
             Type myPropType = type;
             Type myUnderLyingType = myPropType;
-            if (toParse != null) toParse = toParse.ToLower();
+            if (toParse != null) toParse = toParse;
             bool isNullable = myPropType.IsGenericType && myPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             if (isNullable)
@@ -120,11 +120,11 @@ namespace ConsoleCommon.Parsing
             {
                 if (myUnderLyingType == typeof(bool))
                 {
-                    if (BoolFalseValues.Contains(toParse))
+                    if (BoolFalseValues.Contains(toParse?.ToLower()))
                     {
                         return false;
                     }
-                    else if (BoolTrueValues.Contains(toParse))
+                    else if (BoolTrueValues.Contains(toParse?.ToLower()))
                     {
                         return true;
                     }
