@@ -42,8 +42,8 @@ namespace ConsoleCommon.Parsing
         private object ParseArray(string toParse, Type type)
         {
             Type elementType = type.GetElementType();
-            //Comma delimited, space delimited, or comma+space delimited
-            string[] splits = toParse.Split(new string[] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
+            //Comma delimited, or comma+space delimited
+            string[] splits = toParse.Split(new string[] { ","}, StringSplitOptions.RemoveEmptyEntries);
             splits = splits.Select(s => s.Trim()).ToArray();
             Type[] myTypes = new Type[] { typeof(int) };
             object[] myReqs = new object[] { splits.Length };

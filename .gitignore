@@ -28,3 +28,4 @@
 /.vs/ConsoleCommon/v15/Server/sqlite3/storage.ide-shm
 /.vs/ConsoleCommon/v15/Server/sqlite3/storage.ide
 /.vs/ConsoleCommon/v15/Server/sqlite3/db.lock
+*.dtbcache
