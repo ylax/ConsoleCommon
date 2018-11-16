@@ -9,6 +9,7 @@ using System.Text;
 using ConsoleCommon.Entities;
 using ConsoleCommon.Parsing;
 using ConsoleCommon.HelpText;
+using ConsoleCommon.Parsing.TypeParsers;
 
 namespace ConsoleCommon
 {
@@ -50,8 +51,8 @@ namespace ConsoleCommon
         ISwitchParser _defaultSwitchParser;
         protected virtual ISwitchParser SwitchParser { get { return _defaultSwitchParser; } }
 
-        ITypeParser _defaultTypeParser;
-        protected virtual ITypeParser TypeParser { get { return _defaultTypeParser; } }
+        ITypeParserContainer _defaultTypeParserContainer;
+        protected virtual ITypeParserContainer TypeParser { get { return _defaultTypeParserContainer; } }
         #endregion
 
         #endregion
@@ -63,7 +64,7 @@ namespace ConsoleCommon
             {
                 this.args = args;
                 _defaultSwitchOptions = new SwitchOptions(new List<char> { '/' }, new List<char> { ':' }, "[_A-Za-z]+[_A-Za-z0-9]*");
-                _defaultTypeParser = new PrimitiveParser();
+                _defaultTypeParserContainer = new DefaultTypeContainer();
                 _defaultSwitchParser = new SwitchParser(TypeParser, this);
                 _helpOptions = new HelpTextOptions(HelpTextLength, HelpTextIndentLength, HelpCommands);
                 _defaultHelpTextParser = new BasicHelpTextParser(_helpOptions, TypeParser);

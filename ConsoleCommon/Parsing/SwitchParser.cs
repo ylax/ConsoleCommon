@@ -10,14 +10,14 @@ namespace ConsoleCommon.Parsing
 {
     public class SwitchParser : ISwitchParser
     {
-        ITypeParser _typeParser;
+        ITypeParserContainer _typeParser;
         List<SwitchParameterEntity> _availableSwitchProps;
         List<SwitchParameterEntity> _inputSwitches;
         public List<SwitchParameterEntity> InputSwitches { get { return _inputSwitches; } }
         SwitchOptions _options;
         ParamsObject _paramsObject;
 
-        public SwitchParser(ITypeParser typeParser, ParamsObject paramsObject)
+        public SwitchParser(ITypeParserContainer typeParser, ParamsObject paramsObject)
         {
             _typeParser = typeParser;
             _paramsObject = paramsObject;
@@ -85,7 +85,7 @@ namespace ConsoleCommon.Parsing
                     _match = Regex.Match(_arg, _options.FlagSwitchRegex);
                     if (_match.Success) _switchProp = GetSwitchOrFlag(_arg, _match, true);
                 }
-                //default
+                //default ordinal
                 if(!_match.Success) _switchProp = GetDefault(_arg);
                 _inputSwitches.Add(_switchProp);
             }
@@ -107,6 +107,7 @@ namespace ConsoleCommon.Parsing
             }
             _newSwitch.SwitchNameFromInput = match.Value.Substring(1, _length).ToUpper();
             SwitchParameterEntity _pe = _availableSwitchProps.FirstOrDefault(s => s.SwitchAttribute.SwitchName.ToUpper() == _newSwitch.SwitchNameFromInput);
+            if (_pe == null) _pe = _availableSwitchProps.FirstOrDefault(s => s.SwitchProperty.Name.ToUpper() == _newSwitch.SwitchNameFromInput);
             if (_pe != null)
             {
                 _newSwitch.SwitchAttribute = _pe.SwitchAttribute;

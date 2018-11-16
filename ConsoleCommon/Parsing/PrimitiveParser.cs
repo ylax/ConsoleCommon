@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleCommon.Parsing.TypeParsers.Interfaces;
 
 namespace ConsoleCommon.Parsing
 {
-    public class PrimitiveParser : ITypeParser
+    public class PrimitiveParser : ITypeParserContainer
     {
         #region Implementation
         public object Parse(string toParse, Type type)
@@ -64,7 +65,6 @@ namespace ConsoleCommon.Parsing
             object myVal = null;
             Type myPropType = type;
             Type myUnderLyingType = myPropType;
-            if (toParse != null) toParse = toParse;
             bool isNullable = myPropType.IsGenericType && myPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             if (isNullable)
@@ -120,11 +120,11 @@ namespace ConsoleCommon.Parsing
             {
                 if (myUnderLyingType == typeof(bool))
                 {
-                    if (BoolFalseValues.Contains(toParse?.ToLower()))
+                    if (BoolFalseValues.Contains(toParse?.ToLower().Trim()))
                     {
                         return false;
                     }
-                    else if (BoolTrueValues.Contains(toParse?.ToLower()))
+                    else if (BoolTrueValues.Contains(toParse?.ToLower().Trim()))
                     {
                         return true;
                     }
@@ -159,7 +159,7 @@ namespace ConsoleCommon.Parsing
         {
             get
             {
-                return new string[] { "y", "yes", "true", "t", "on", null };
+                return new string[] { "y", "yes", "true", "t", "on", null,"" };
             }
         }
         
@@ -170,6 +170,11 @@ namespace ConsoleCommon.Parsing
         private string[] GetEnumAcceptedValues(Type enumType)
         {
             return Enum.GetNames(enumType);
+        }
+
+        public ITypeParser GetParser(Type typeToParse)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

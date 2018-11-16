@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using ConsoleCommon.Entities;
 using ConsoleCommon.Parsing;
+using ConsoleCommon.Parsing.TypeParsers.Interfaces;
+using ConsoleCommon.Parsing.TypeParsers;
 
 namespace ConsoleCommon
 {
@@ -13,12 +15,33 @@ namespace ConsoleCommon
     /// </summary>
     public static class program
     {
+        class ExParams : ParamsObject
+        {
+            public ExParams(string[] args) : base(args)
+            {
+            }
+            [Switch("F")]
+            public string FirstName { get; set; }
+            [Switch("L")]
+            public string LastName { get; set; }
+            [Switch("A")]
+            public string[] MyArray { get; set; }
+            [Switch("H")]
+            public KeyValuePair<string,string> HomeName { get; set; }
+            [Switch("C")]
+            public int Count { get; set; }
+            protected override ITypeParserContainer TypeParser =>
+                new TypeParserContainer(true, 
+                    new ArrayParser(), new KeyValueParser(), new ObjectParser());
+        }
         class Program
         {
             static void Main(string[] args)
             {
                 try
                 {
+                    var myPars = new ExParams(new string[] { "/C:55", "/F:Yisrael", "/L:Lax", "/A:one,two", "/H:manion:yellow" });
+                    myPars.CheckParams();
                     args = new string[] { "Yisrael", "Lax", "/Int:Pizza,Parachuting", "/Pets:dog:5,cat:3,bird:1" };//"/T:pizza shop", "/DOB:11-28-1987", "/Case", "/Regions:Northeast,Central" };
                     //This step will do type validation
                     //and automatically cast the string args to a strongly typed object:
@@ -71,6 +94,102 @@ namespace ConsoleCommon
             }
         }
 
+        class MyBetterDate : IConvertible
+        {
+            IFormatProvider _formatProvider;
+            DateTime _internalDate;
+            MyBetterDate(DateTime internalDate)
+            {
+                _internalDate = internalDate;
+                _formatProvider = System.Globalization.CultureInfo.CreateSpecificCulture("en");
+            }
+
+            public TypeCode GetTypeCode()
+            {
+                return TypeCode.DateTime;
+            }
+
+            public bool ToBoolean(IFormatProvider provider)
+            {
+                return (_internalDate as IConvertible).ToBoolean(_formatProvider);
+            }
+
+            public byte ToByte(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public char ToChar(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public DateTime ToDateTime(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public decimal ToDecimal(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public double ToDouble(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public short ToInt16(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int ToInt32(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public long ToInt64(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public sbyte ToSByte(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public float ToSingle(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public string ToString(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object ToType(Type conversionType, IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public ushort ToUInt16(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public uint ToUInt32(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+
+            public ulong ToUInt64(IFormatProvider provider)
+            {
+                throw new NotImplementedException();
+            }
+        }
+         
         public enum CustomerRegion
         {
             None,
@@ -120,7 +239,7 @@ namespace ConsoleCommon
             [SwitchHelpText("The date of birth of customer")]
             [Switch("DOB", false, 3)]
             public DateTime DOB { get; set; }
-
+            
             [Switch("T", false, 4)]
             [SwitchHelpText("Customer type")]
             public Type CustomerType { get; set; }
@@ -140,7 +259,7 @@ namespace ConsoleCommon
             [Switch("Pets")]
             public KeyValuePair<string,int>[] PetCount { get; set; }
             #endregion
-
+            
             #region Other Functions
 
             public override Dictionary<Func<bool>, string> GetParamExceptionDictionary()

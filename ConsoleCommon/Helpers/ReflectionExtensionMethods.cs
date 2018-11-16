@@ -73,5 +73,52 @@ namespace ConsoleCommon
         {
             return src.GetType().GetProperties().Where(pi => pi.GetCustomAttributes(true).Contains(attr)).FirstOrDefault();
         }
+        public static object GetPropertyValue(this object src, string propName, int index = -1)
+        {
+            object[] _index = getPropIndex(index);
+            return getProp(src, propName).GetValue(src, _index);
+        }
+        public static T GetPropertyValue<T>(this object src, string propName, int index = -1)
+        {
+            PropertyInfo _prop = getProp(src, propName);
+            if (!_prop.PropertyType.IsAssignableFrom(typeof(T))) throw new Exception($"Property '{propName}' does not match type '{typeof(T).Name}'");
+            object[] _index = getPropIndex(index);
+            object _propVal = _prop.GetValue(src, _index);
+
+            //return null if null
+            if (typeof(T).IsClass && _propVal == null) return default(T);
+
+            //return
+            return (T)_propVal;
+        }
+        public static bool CompareValues(object val1, object val2)
+        {
+            bool _isEqual = false;
+            if (val1 == null || val2 == null)
+            {
+                _isEqual = val1 == null && val2 == null;
+            }
+            else if(val1!=null && val2!=null && val1.GetType().IsAssignableFrom(typeof(string)))
+            {
+                _isEqual = val1.ToString() == val2.ToString();
+            }
+            else
+            {
+                _isEqual = val1 == val2;
+            }
+            return _isEqual;
+        }
+        private static PropertyInfo getProp(object src, string propName)
+        {
+            PropertyInfo _prop = src.GetType().GetProperties().FirstOrDefault(p=>p.Name == propName);
+            if (_prop == null) throw new Exception($"Property '{propName}' not found");
+            return _prop;
+        }
+        private static object[] getPropIndex(int index = -1)
+        {
+            object[] _index = null;
+            if (index > 0) _index = new object[] { index };
+            return _index;
+        }
     }
 }

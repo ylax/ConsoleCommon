@@ -10,8 +10,8 @@ namespace ConsoleCommon.HelpText
     public class BasicHelpTextParser : IHelpTextParser
     {
         HelpTextOptions _options;
-        ITypeParser _parser;
-        public BasicHelpTextParser(HelpTextOptions options, ITypeParser parser)
+        ITypeParserContainer _parser;
+        public BasicHelpTextParser(HelpTextOptions options, ITypeParserContainer parser)
         {
             _options = options;
             _parser = parser;
