@@ -9,7 +9,7 @@ namespace ConsoleCommon.Tests.Helpers
 {
     public static class ParamsObjectTestHelpers
     {
-        public static void AssertCheckParams(ParamsObject paramObj, string errMsg = "", bool shouldFail = false, string expctdErrMsg = "")
+        public static Exception AssertCheckParams(ParamsObject paramObj, string errMsg = "", bool shouldFail = false, string expctdErrMsg = "")
         {
             bool _hasExpctdErr = !string.IsNullOrWhiteSpace(expctdErrMsg);
             string _expctdErrMsg = expctdErrMsg;
@@ -35,6 +35,7 @@ namespace ConsoleCommon.Tests.Helpers
                 (_hasExpctdErr && _ex != null && removePeriod(_ex.Message).ToLower().Trim() == removePeriod(expctdErrMsg).ToLower().Trim()) ||
                 (!_hasExpctdErr && _ex != null)
                 ) || (!shouldFail && _ex == null), _errMsg);
+            return _ex;
         }
         private static string removePeriod(string text)
         {

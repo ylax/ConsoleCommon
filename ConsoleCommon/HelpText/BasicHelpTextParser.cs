@@ -18,7 +18,13 @@ namespace ConsoleCommon.HelpText
         }
         public virtual string GetUsage(ParamsObject InputParams)
         {
-            string _usage = System.IO.Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly().Location) + " ";
+            string _appName = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+            if (_appName != null)
+            {
+                _appName = System.IO.Path.GetFileName(_appName);
+            }
+            else _appName = "AppName.exe";
+            string _usage = _appName + " ";
             IEnumerable<SwitchAttribute> switchAttrs = getOrderedSwitches(InputParams);
             foreach (SwitchAttribute switchAttr in switchAttrs)
             {

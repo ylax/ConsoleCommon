@@ -6,7 +6,7 @@ using ConsoleCommon.Parsing.TypeParsers.Interfaces;
 
 namespace ConsoleCommon.Parsing.TypeParsers
 {
-    public class ArrayParser : TypeParserBase<object[]>
+    public class ArrayParser : TypeParserBase<Array>
     {
         public override object Parse(string toParse, Type typeToParse, ITypeParserContainer parserContainer)
         {

@@ -16,7 +16,8 @@ namespace ConsoleCommon.Parsing.TypeParsers
             {
                 _parseEnumAsArray = true;
                 Type _enumArrayType = typeToParse.MakeArrayType();
-                Array _enumArray = parserContainer.GetParser(_enumArrayType).Parse(toParse, _enumArrayType, parserContainer) as Array;
+                ITypeParser _arrayParser = parserContainer.GetParser(_enumArrayType);
+                Array _enumArray = _arrayParser.Parse(toParse, _enumArrayType, parserContainer) as Array;
                 int _totalVal = 0;
                 int _iter = 0;
 

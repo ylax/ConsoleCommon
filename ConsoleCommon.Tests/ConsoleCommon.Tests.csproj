@@ -52,6 +52,7 @@
     <Compile Include="DynamicTypeParsing\IEmptyObject.cs" />
     <Compile Include="DynamicTypeParsing\OtherInterfaces.cs" />
     <Compile Include="DynamicTypeParsing\PropertyBuilding.cs" />
+    <Compile Include="FullExampleTest.cs" />
     <Compile Include="Helpers\DynamicParamsCreator.cs" />
     <Compile Include="Helpers\ParamsObjectTestHelpers.cs" />
     <Compile Include="ParamsObjectCreatorTests.cs" />

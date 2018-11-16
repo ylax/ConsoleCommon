@@ -10,22 +10,32 @@ using ConsoleCommon.Parsing.TypeParsers;
 using ConsoleCommon.Parsing.TypeParsers.Interfaces;
 using System.Reflection;
 using System.Security;
+using ConsoleCommon.Tests.Helpers;
 
 namespace ConsoleCommon.Tests
 {
     [TestFixture]
     public class DefaultTypeParsingTests
     {
+        [TypeParam("Employee")]
+        public class EmployeePersonType { }
+        [TypeParam("Customer")]
+        public class CustomerPersonType { }
         public enum MyColors
         {
             Orange,
             Blue,
-            Yello
+            Yellow
         }
-        private string[] GetArgs(params string[] args)
+        [Flags]
+        public enum MyPets
         {
-            return args;
+            None = 0,
+            Dog = 2,
+            Cat = 4,
+            Turtle = 8
         }
+        #region FullParsing
         [Test]
         public void TestAllDefaultParsing_Is_AllValuesSet()
         {
@@ -38,7 +48,7 @@ namespace ConsoleCommon.Tests
                 .AddSwitch<MyColors>("Color")
                 .AddSwitch<int>("Height")
                 .AddSwitch<SecureString>("pw")
-                .FinishBuilding("/Nums:one,two,three", "/IsItTrue:true", 
+                .FinishBuilding("/Nums:one,two,three", "/IsItTrue:true",
                 "/NameAge:yiz:30", "/Color:Blue", "/Height:65", "/pw:passw0rd");
 
             bool _parseErr = false;
@@ -49,7 +59,7 @@ namespace ConsoleCommon.Tests
             catch { _parseErr = true; }
             Assert.IsFalse(_parseErr, "Check params failed");
             Assert.IsTrue(_paramObj.GetPropertyValue<string[]>("Nums")[1] == "two");
-            Assert.IsTrue(_paramObj.GetPropertyValue<bool>("IsItTrue")==true);
+            Assert.IsTrue(_paramObj.GetPropertyValue<bool>("IsItTrue") == true);
             Assert.IsTrue(_paramObj.GetPropertyValue<KeyValuePair<string, int>>("NameAge").Value == 30);
             Assert.IsTrue(_paramObj.GetPropertyValue<MyColors>("Color") == MyColors.Blue);
             Assert.IsTrue(_paramObj.GetPropertyValue<int>("Height") == 65);
@@ -84,14 +94,17 @@ namespace ConsoleCommon.Tests
             Assert.IsTrue(_paramObj.GetPropertyValue<int>("Height") == 0);
             Assert.IsTrue(_paramObj.GetPropertyValue<SecureString>("pw").Length == 8);
         }
+        #endregion
+
+        #region KeyValue, string, int Parsing
         [Test]
         public void TestKeyValueOnlyParsing_Bad()
         {
             ParamsObject _paramObj =
             DynamicParamsCreator
                 .Create()
-                .OverrideTypeParsers(()=> new TypeParserContainer(false, new KeyValueParser()))
-                .AddSwitch<KeyValuePair<string,int>>("NameAge")
+                .OverrideTypeParsers(() => new TypeParserContainer(false, new KeyValueParser()))
+                .AddSwitch<KeyValuePair<string, int>>("NameAge")
                 .AddSwitch<string>("FirstName")
                 .FinishBuilding("/NameAge:Yizzy:30");
 
@@ -105,7 +118,7 @@ namespace ConsoleCommon.Tests
             }
             catch { _parseErr = true; }
             Assert.IsTrue(_parseErr, "String and int parsers were not explicated, so this should have failed");
-            KeyValuePair<string, int> _namgeAge = 
+            KeyValuePair<string, int> _namgeAge =
                 _paramObj.GetPropertyValue<KeyValuePair<string, int>>("NameAge");
             Assert.IsNull(_namgeAge.Key, "Name key should have been null");
             Assert.IsTrue(_namgeAge.Value == 0, "Age value should have been null");
@@ -137,6 +150,9 @@ namespace ConsoleCommon.Tests
             Assert.IsTrue(_namgeAge.Value.Key == "Yizzy");
             Assert.IsTrue(_namgeAge.Value.Value == 30);
         }
+        #endregion
+
+        #region DateTime parsing (ObjectParser)
         [Test]
         public void Test_DateTimeParsing_Bad()
         {
@@ -178,17 +194,100 @@ namespace ConsoleCommon.Tests
             DateTime _bday = _paramObj.GetPropertyValue<DateTime>("Bday");
             Assert.IsTrue(_bday == new DateTime(1987, 11, 28), "Bday is incorrect");
         }
-        private T getPropVal<T>(object obj, string propName)
+        #endregion
+
+        #region Type Parsing
+        [Test]
+        public void Test_TypeTypeParser_FriendName_Good()
         {
-            PropertyInfo _prop = obj.GetType().GetProperty(propName);
-            object _val = _prop.GetValue(obj);
-            if (_val == null) return default(T);
-            return (T)_val;
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType")
+                .FinishBuilding("/PersonType:Employee");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed");
+            Assert.IsTrue(_paramObj.GetPropertyValue<Type>("PersonType") == typeof(EmployeePersonType));
         }
-        private void setPropVal(object obj, string propName, object propVal)
+        [Test]
+        public void Test_TypeTypeParser_FriendName_Bad()
         {
-            PropertyInfo _prop = obj.GetType().GetProperty(propName);
-            _prop.SetValue(obj, propVal);
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType")
+                .FinishBuilding("/PersonType:NotReal");
+
+            Assert.IsTrue(_paramObj.GetPropertyValue<Type>("PersonType") == null);
         }
+        [Test]
+        public void Test_TypeTypeParser_ClassName_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType")
+                .FinishBuilding("/PersonType:EmployeePersonType");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed");
+            Assert.IsTrue(_paramObj.GetPropertyValue<Type>("PersonType") == typeof(EmployeePersonType));
+        }
+        #endregion
+
+        #region Enum Parsing
+        [Test]
+        public void Test_BasicEnumParsing_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<MyColors>("Color")
+                .FinishBuilding("/Color:Yellow");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj);
+            Assert.IsTrue(_paramObj.GetPropertyValue<MyColors>("Color") == MyColors.Yellow);
+        }
+
+        [Test]
+        public void Test_FlagsEnumParsing_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<MyPets>("Pets")
+                .FinishBuilding("/Pets:Dog,Turtle");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj);
+            Assert.IsTrue(_paramObj.GetPropertyValue<MyPets>("Pets") == (MyPets.Dog | MyPets.Turtle));
+        }
+        #endregion
+
+        #region Arrays
+        [Test]
+        public void TestKeyValueArray_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<KeyValuePair<string, int>[]>("NameAges")
+                .FinishBuilding("/NameAges:Yisrael:30,Srully:10,Yitschak:40");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj);
+            KeyValuePair<string, int>[] _nameAges = _paramObj.GetPropertyValue<KeyValuePair<string, int>[]>("NameAges");
+            Assert.IsNotNull(_nameAges);
+            Assert.IsTrue(_nameAges.Length == 3);
+            Assert.IsTrue(_nameAges[1].Key == "Srully");
+            Assert.IsTrue(_nameAges[1].Value == 10);
+        }
+        [Test]
+        public void TestEnumArray_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<MyColors[]>("Colors")
+                .FinishBuilding("/Colors:Orange,Yellow");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj);
+            MyColors[] _colors = _paramObj.GetPropertyValue<MyColors[]>("Colors");
+            Assert.IsNotNull(_colors);
+            Assert.IsTrue(_colors.Length == 2);
+            Assert.IsTrue(_colors[0] == MyColors.Orange);
+            Assert.IsTrue(_colors[1] == MyColors.Yellow);
+        }
+        #endregion
     }
 }
