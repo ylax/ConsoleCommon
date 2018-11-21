@@ -10,12 +10,12 @@ namespace ConsoleCommon.Parsing
 {
     public class SwitchParser : ISwitchParser
     {
-        ITypeParserContainer _typeParser;
-        List<SwitchParameterEntity> _availableSwitchProps;
-        List<SwitchParameterEntity> _inputSwitches;
+        protected ITypeParserContainer _typeParser;
+        protected List<SwitchParameterEntity> _availableSwitchProps;
+        protected List<SwitchParameterEntity> _inputSwitches;
         public List<SwitchParameterEntity> InputSwitches { get { return _inputSwitches; } }
-        SwitchOptions _options;
-        ParamsObject _paramsObject;
+        protected SwitchOptions _options;
+        protected ParamsObject _paramsObject;
 
         public SwitchParser(ITypeParserContainer typeParser, ParamsObject paramsObject)
         {
@@ -45,7 +45,7 @@ namespace ConsoleCommon.Parsing
                 return _exes;
             }
         }
-        private void SetPropertyValues()
+        protected virtual void SetPropertyValues()
         {
             foreach(SwitchParameterEntity _switch in _inputSwitches)
             {
@@ -63,7 +63,7 @@ namespace ConsoleCommon.Parsing
         }
 
         #region Separation
-        private void SeparateSwitchesFlagsDefaults(string[] args)
+        protected virtual void SeparateSwitchesFlagsDefaults(string[] args)
         {
             //Three types of args:
             //1) no switch (using default ordinal)
@@ -92,7 +92,7 @@ namespace ConsoleCommon.Parsing
             //GetDefault() doesn't get the properties for default args.
             GetDefaults();
         }
-        private SwitchParameterEntity GetSwitchOrFlag(string arg, Match match, bool isFlag)
+        protected virtual SwitchParameterEntity GetSwitchOrFlag(string arg, Match match, bool isFlag)
         {
             SwitchParameterEntity _newSwitch = new SwitchParameterEntity()
             {
@@ -116,7 +116,7 @@ namespace ConsoleCommon.Parsing
             else _newSwitch.MatchException = new Exception("Invalid switch!");
             return _newSwitch;
         }     
-        private SwitchParameterEntity GetDefault(string arg)
+        protected virtual SwitchParameterEntity GetDefault(string arg)
         {
             SwitchParameterEntity _newSwitch = new SwitchParameterEntity()
             {
@@ -126,7 +126,7 @@ namespace ConsoleCommon.Parsing
             };
             return _newSwitch;
         }
-        private void GetDefaults()
+        protected virtual void GetDefaults()
         {
             try
             {
@@ -190,7 +190,7 @@ namespace ConsoleCommon.Parsing
         #endregion
 
         #region Initialization
-        private void GetAvailableSwitchProperties()
+        protected virtual void GetAvailableSwitchProperties()
         {
             _availableSwitchProps = new List<SwitchParameterEntity>();
             foreach(PropertyInfo _pi in _paramsObject.GetType().GetProperties())
@@ -199,7 +199,7 @@ namespace ConsoleCommon.Parsing
                 if (_attr != null) _availableSwitchProps.Add(new SwitchParameterEntity { SwitchProperty = _pi, SwitchAttribute = _attr });
             }
         }
-        private void GetSwitchOptions()
+        protected virtual void GetSwitchOptions()
         {
             _options = new SwitchOptions(_paramsObject.Options.SwitchStartChars, _paramsObject.Options.SwitchEndChars, _paramsObject.Options.SwitchNameRegex);
         }

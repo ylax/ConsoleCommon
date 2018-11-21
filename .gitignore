@@ -32,3 +32,4 @@
 /ConsoleCommon.Tests/bin/Debug
 /ConsoleCommon.Tests/obj/Debug
 /packages/NUnit.3.11.0
+/ConsoleCommon.Tests/obj/Release

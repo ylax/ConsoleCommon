@@ -55,11 +55,13 @@
     <Compile Include="FullExampleTest.cs" />
     <Compile Include="Helpers\DynamicParamsCreator.cs" />
     <Compile Include="Helpers\ParamsObjectTestHelpers.cs" />
+    <Compile Include="InlineHelpTextAndDefaultSwitchNameTest.cs" />
     <Compile Include="ParamsObjectCreatorTests.cs" />
     <Compile Include="DynamicTypeParsing\DynamicTypeCreator.cs" />
     <Compile Include="CustomParsingTests.cs" />
     <Compile Include="DefaultTypeParsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCommandInputText.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

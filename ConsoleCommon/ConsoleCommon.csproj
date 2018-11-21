@@ -53,10 +53,12 @@
     <Compile Include="Entities\InputParameterType.cs" />
     <Compile Include="Entities\SwitchOptions.cs" />
     <Compile Include="Entities\SwitchParameterEntity.cs" />
+    <Compile Include="Helpers\CommandLineHelpers.cs" />
     <Compile Include="Helpers\TypesByInheritanceLevelComparer.cs" />
     <Compile Include="HelpText\BasicHelpTextParser.cs" />
     <Compile Include="HelpText\IHelpTextOptions.cs" />
     <Compile Include="HelpText\IHelpTextParser.cs" />
+    <Compile Include="Parsing\StringSwitchParser.cs" />
     <Compile Include="Parsing\TypeParserContainerBase.cs" />
     <Compile Include="Parsing\TypeParsers\Concrete\ArrayParser.cs" />
     <Compile Include="Parsing\TypeParsers\Concrete\BoolParser.cs" />

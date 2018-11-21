@@ -10,6 +10,7 @@ using ConsoleCommon.Entities;
 using ConsoleCommon.Parsing;
 using ConsoleCommon.HelpText;
 using ConsoleCommon.Parsing.TypeParsers;
+using ConsoleCommon.Helpers;
 
 namespace ConsoleCommon
 {
@@ -53,28 +54,57 @@ namespace ConsoleCommon
 
         ITypeParserContainer _defaultTypeParserContainer;
         protected virtual ITypeParserContainer TypeParser { get { return _defaultTypeParserContainer; } }
+
+        IArgumentCreator _defaultArgMaker;
+        protected virtual IArgumentCreator ArgMaker { get { return _defaultArgMaker; } }
         #endregion
 
         #endregion
 
         #region Constructors
+        private void Initialize()
+        {
+            _defaultSwitchOptions = new SwitchOptions(new List<char> { '/' }, new List<char> { ':' }, "[_A-Za-z]+[_A-Za-z0-9]*");
+            _defaultTypeParserContainer = new DefaultTypeContainer();
+            _defaultSwitchParser = new SwitchParser(TypeParser, this);
+            _helpOptions = new HelpTextOptions(HelpTextLength, HelpTextIndentLength, HelpCommands);
+            _defaultHelpTextParser = new BasicHelpTextParser(_helpOptions, TypeParser);
+            _defaultArgMaker = new DefaultArgumentCreator();
+        }
+        private void PostInitialize()
+        {
+            if (GetHelpIfNeeded() == string.Empty)
+            {
+                SwitchParser.ParseSwitches(args);
+            }
+            _paramExceptionDictionary = new Dictionary<Func<bool>, string>();
+            AddAdditionalParamChecks();
+            foreach (var item in GetParamExceptionDictionary()) _paramExceptionDictionary.Add(item.Key, item.Value);
+        }
+        public ParamsObject() : this(
+            CommandLineHelpers.RemoveAppNameFromArgs(Environment.CommandLine, Environment.CurrentDirectory))
+        {
+        }
+        public ParamsObject(string commandText)
+        {
+            try
+            {
+                Initialize();
+                this.args = ArgMaker.GetArgs(commandText, Options);
+                PostInitialize();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public ParamsObject(string[] args)
         {
             try
             {
+                Initialize();
                 this.args = args;
-                _defaultSwitchOptions = new SwitchOptions(new List<char> { '/' }, new List<char> { ':' }, "[_A-Za-z]+[_A-Za-z0-9]*");
-                _defaultTypeParserContainer = new DefaultTypeContainer();
-                _defaultSwitchParser = new SwitchParser(TypeParser, this);
-                _helpOptions = new HelpTextOptions(HelpTextLength, HelpTextIndentLength, HelpCommands);
-                _defaultHelpTextParser = new BasicHelpTextParser(_helpOptions, TypeParser);
-                if (GetHelpIfNeeded() == string.Empty)
-                {
-                    SwitchParser.ParseSwitches(args);
-                }
-                _paramExceptionDictionary = new Dictionary<Func<bool>, string>();
-                AddAdditionalParamChecks();
-                foreach (var item in GetParamExceptionDictionary()) _paramExceptionDictionary.Add(item.Key, item.Value);
+                PostInitialize();
             }
             catch (Exception ex)
             {

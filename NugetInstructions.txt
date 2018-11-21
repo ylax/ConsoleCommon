@@ -1,0 +1,6 @@
+1) Update .nuspec file. Save in proj base dir.
+2) From command prompt, navigate to project base folder
+3) Enter "NuGet pack" => output is a nupkg file
+4) Validate nupkg file by changing ext to .zip, opening, and inspecting contents (should have .dll and .nuspec file). Make sure to change ext back to .nupkg
+5) On Nuget.Org: upload => select nupkg => submit
+6) OR: "Nuget push {nupkg filename} {access key}"

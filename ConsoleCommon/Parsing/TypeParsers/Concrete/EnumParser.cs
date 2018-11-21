@@ -36,5 +36,13 @@ namespace ConsoleCommon.Parsing.TypeParsers
             else _returnVal = Enum.Parse(typeToParse, toParse, true);
             return _returnVal;
         }
+        public override string[] GetAcceptedValues(Type typeToParse)
+        {
+            if (typeToParse.IsEnum)
+            {
+                return Enum.GetNames(typeToParse);
+            }
+            else return new string[0] { };
+        }
     }
 }

@@ -73,7 +73,6 @@ namespace ConsoleCommon.Tests
         [Switch("Regions")]
         [SwitchHelpText("Specifies the regions the customer does business in")]
         public CustomerRegion[] CustRegions { get; set; }
-
         [Switch("Int")]
         [SwitchHelpText("Specifies customer's interests")]
         public CustomerInterests Interests { get; set; }

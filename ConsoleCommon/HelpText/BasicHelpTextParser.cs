@@ -51,11 +51,16 @@ namespace ConsoleCommon.HelpText
             string _help = _defaultOrdinalMessage + Environment.NewLine;
             foreach (SwitchAttribute switchAttr in switchAttrs)
             {
-                SwitchHelpTextAttribute helpText = InputParams.GetPropertyByAttribute(switchAttr).GetCustomAttribute<SwitchHelpTextAttribute>();
-                if (helpText == null) continue;
+                string _name = "";
+                string _description = switchAttr.HelpText;
+                if (string.IsNullOrWhiteSpace(_description))
+                {
+                    SwitchHelpTextAttribute _helpText = InputParams.GetPropertyByAttribute(switchAttr).GetCustomAttribute<SwitchHelpTextAttribute>();
+                    if (_helpText == null) continue;
+                    _name = _helpText.Name;
+                    _description = _helpText.Description;
+                }
                 _atLeastOne++;
-                string _name = helpText.Name;
-                string _description = helpText.Description;
                 string _isoptional = switchAttr.Required ? "Required" : "Optional";
                 string _acceptedValues = "";
                 string _noDefaultOrdinal = defaultOrdinalAllowed && switchAttr.DefaultOrdinal.HasValue ? "" : "No default ordinal. ";
@@ -72,6 +77,7 @@ namespace ConsoleCommon.HelpText
                         _acceptedValArr.ElementAt(_acceptedValArr.Length - 1).ToUpper());
                 }
                 if (string.IsNullOrEmpty(_name)) _name = switchAttr.SwitchName;
+                if (string.IsNullOrEmpty(_name)) _name = InputParams.GetPropertyByAttribute(switchAttr)?.Name;
                 _name = _name.ToUpper();
                 _help += Environment.NewLine + string.Format("/{0," + (_options.HelpTextIndentLength * -1).ToString() + "} {1}. {2}{3}. {4}", _name + ": ", _isoptional, _noDefaultOrdinal, _description, _acceptedValues);
             }

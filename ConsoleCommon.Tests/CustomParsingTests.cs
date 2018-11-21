@@ -16,12 +16,8 @@ namespace ConsoleCommon.Tests
     [TestFixture]
     public class CustomParsingTests
     {
-        public class DateTimeParser : TypeParserBase<DateTime>
+        public class DayFirstDashOnlyDateTimeParser : TypeParserBase<DateTime>
         {
-            public DateTimeParser() : base()
-            {
-
-            }
             public override object Parse(string toParse, Type typeToParse, ITypeParserContainer parserContainer)
             {
                 CultureInfo _culture = CultureInfo.CreateSpecificCulture("");
@@ -38,7 +34,6 @@ namespace ConsoleCommon.Tests
                 .AddSwitch<DateTime>("Bday")
                 .AddSwitch<int>("Age")
                 .AddSwitch<string>("Name")
-                .OverrideTypeParsers(()=>new TypeParserContainer(true, new DefaultTypeContainer(), new DateTimeParser()))
                 .FinishBuilding("/Bday:28/11/1987", "/Age:30", "/Name:Yisrael Lax");
 
             ParamsObjectTestHelpers.AssertCheckParams(_paramObj, 
@@ -58,7 +53,7 @@ namespace ConsoleCommon.Tests
                 .AddSwitch<DateTime>("Bday")
                 .AddSwitch<int>("Age")
                 .AddSwitch<string>("Name")
-                .OverrideTypeParsers(() => new TypeParserContainer(true, new DefaultTypeContainer(), new DateTimeParser()))
+                .OverrideTypeParsers(() => new TypeParserContainer(true, new DefaultTypeContainer(), new DayFirstDashOnlyDateTimeParser()))
                 .FinishBuilding("/Bday:28-11-1987", "/Age:30", "/Name:Yisrael Lax");
 
             ParamsObjectTestHelpers.AssertCheckParams(_paramObj);
