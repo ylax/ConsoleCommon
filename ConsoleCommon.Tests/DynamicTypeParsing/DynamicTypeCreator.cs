@@ -119,6 +119,7 @@ namespace ConsoleCommon.Tests
         {
             if (ctorArgTypes.Length != ctorArgs.Length) throw new Exception("Type count must match arg count for attribute specification");
             ConstructorInfo _attrCtor = attrType.GetConstructor(ctorArgTypes);
+            if (_attrCtor == null) throw new Exception("Cstor for property attribute not found");
             for (int i = 0; i < ctorArgTypes.Length; i++)
             {
                 CustomAttributeBuilder _attrBuild = new CustomAttributeBuilder(_attrCtor, ctorArgs);

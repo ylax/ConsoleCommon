@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckForHelpTests.cs" />
     <Compile Include="DynamicTypeCreatorTests.cs" />
     <Compile Include="DynamicTypeParsing\DynamicTypeCreatorBaseAddMethods.cs" />
     <Compile Include="DynamicTypeParsing\DynamicTypeCreatorBaseAddProperty.cs" />

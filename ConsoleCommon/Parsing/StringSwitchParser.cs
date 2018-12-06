@@ -5,16 +5,33 @@ using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using ConsoleCommon.Entities;
+using ConsoleCommon.HelpText;
 
 namespace ConsoleCommon.Parsing
 {
     public interface IArgumentCreator
     {
+        string[] GetArgs(string args, SwitchOptions _options, IHelpTextParser HelpTextParser);
         string[] GetArgs(string args, SwitchOptions _options);
+    }
+    class BlankParamsObject : ParamsObject
+    {
+        public BlankParamsObject() : base(new string[0] { }) { }
     }
     public class DefaultArgumentCreator : IArgumentCreator
     {
         #region Separation
+        public string[] GetArgs(string args, SwitchOptions _options, IHelpTextParser HelpTextParser)
+        {
+            //check for help
+            //if not needed, parse args
+            string[] _checkForHelp = args.Split(' ');
+            if (_checkForHelp.Length > 0 && !string.IsNullOrWhiteSpace(HelpTextParser.GetHelpIfNeeded(_checkForHelp, new BlankParamsObject())))
+            {
+                return _checkForHelp;
+            }
+            else return GetArgs(args, _options);
+        }
         public string[] GetArgs(string args, SwitchOptions _options)
         {
             //Two types of args:

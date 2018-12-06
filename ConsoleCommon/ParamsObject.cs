@@ -90,7 +90,7 @@ namespace ConsoleCommon
             try
             {
                 Initialize();
-                this.args = ArgMaker.GetArgs(commandText, Options);
+                this.args = ArgMaker.GetArgs(commandText, Options, HelpTextParser);
                 PostInitialize();
             }
             catch (Exception ex)

@@ -24,6 +24,7 @@ namespace ConsoleCommon.Tests
     public interface IFinishParams
     {
         ParamsObject FinishBuilding(params string[] args);
+        ParamsObject FinishBuilding(StringBuilder commandText);
     }
     public static class DynamicParamsCreator
     {
@@ -51,9 +52,9 @@ namespace ConsoleCommon.Tests
         public IAfterPropertyParams AddSwitch(string name, Type type, string switchName = "", bool required = false, int defaultOrdinal = -1, params string[] switchValues)
         {
             string _switchName = string.IsNullOrWhiteSpace(switchName) ? name : switchName;
-
-            Type[] _argTypes = new Type[] { typeof(string), typeof(bool), typeof(int), typeof(string[]) };
-            object[] _argVals = new object[] { _switchName, required, defaultOrdinal, switchValues };
+            //string switchName = "", bool required = false, int defaultOrdinal = -1, string helpText = "", params string[] switchValues
+            Type[] _argTypes = new Type[] { typeof(string), typeof(bool), typeof(int), typeof(string), typeof(string[]) };
+            object[] _argVals = new object[] { _switchName, required, defaultOrdinal, "", switchValues };
 
             _creatorBase
                 .AddAutoProperty(name, type)
@@ -73,6 +74,14 @@ namespace ConsoleCommon.Tests
                 .FinishBuildingType()
                 .GetConstructor(new Type[] { typeof(string[]) })
                 .Invoke(new object[] { args });
+        }
+        public ParamsObject FinishBuilding(StringBuilder commandText)
+        {
+            return (ParamsObject)
+                _creatorBase
+                .FinishBuildingType()
+                .GetConstructor(new Type[] { typeof(string) })
+                .Invoke(new object[] { commandText.ToString() });
         }
     }
 }
