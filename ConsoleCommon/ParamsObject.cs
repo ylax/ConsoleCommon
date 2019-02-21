@@ -138,18 +138,28 @@ namespace ConsoleCommon
         private void AddValueListCheck(PropertyInfo switchMember)
         {
             SwitchAttribute mySwitch = switchMember.GetCustomAttribute<SwitchAttribute>();
-            Func<bool> isRestrictedValue = new Func<bool>(() => mySwitch.SwitchValues.Length != 0 &
-                (
-                    //is null?
-                    switchMember.GetValue(this, null) == null ||
-                        /*//or is a Type and Type.Name = a switch value?
-                        mySwitch.SwitchValues.Where(s=> 
-                            switchMember.PropertyType.Equals(typeof(Type)) && 
-                            ((Type)switchMember.GetValue(this,null)).UnderlyingSystemType.MatchesAttributeValueOrName<TypeParamAttribute>(s,attr=> attr == null ? "" : attr.FriendlyName)).Count() == 0 ||
-                        //or is something else and object.ToString() = a switch value?*/
-                        mySwitch.SwitchValues.Where(s =>
-                            s.ToLower() == switchMember.GetValue(this, null).ToString().ToLower()).Count() == 0
-                ));
+            Func<bool> isRestrictedValue = new Func<bool>(() => {
+
+                bool _hasSwitchVals = mySwitch.SwitchValues.Length != 0;
+                //is null?
+                bool _isNull = !_hasSwitchVals || _hasSwitchVals && switchMember.GetValue(this, null) == null;
+
+                //or is a Type and Type.FriendlyName = a switch value?
+                bool _isTypeNameMatch = _isNull 
+                || (!_isNull 
+                && (switchMember.PropertyType.Equals(typeof(Type))
+                && mySwitch.SwitchValues.Any(s =>
+                    ((Type)switchMember.GetValue(this, null))
+                    .MatchesAttributeValueOrName<TypeParamAttribute>(s, attr => attr == null ? "" : attr.FriendlyName))));
+
+                //or is something else and object.ToString() = a switch value?
+                bool _isDirectMatch = _isTypeNameMatch || (!_isTypeNameMatch && mySwitch.SwitchValues.Any(s =>
+                    s.ToLower() == switchMember.GetValue(this, null).ToString().ToLower()));
+
+                bool _violation = _hasSwitchVals && _isNull || _hasSwitchVals && !_isTypeNameMatch || _hasSwitchVals && !_isDirectMatch;
+                return _violation;
+            });
+
             _paramExceptionDictionary.Add(isRestrictedValue, string.Format("Invalid value for parameter {0}!", switchMember.Name));
         }
 

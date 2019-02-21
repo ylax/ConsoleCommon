@@ -21,6 +21,8 @@ namespace ConsoleCommon.Tests
         public class EmployeePersonType { }
         [TypeParam("Customer")]
         public class CustomerPersonType { }
+        [TypeParam("Boss")]
+        public class BossPersonType { }
         public enum MyColors
         {
             Orange,
@@ -224,6 +226,38 @@ namespace ConsoleCommon.Tests
             ParamsObject _paramObj = DynamicParamsCreator
                 .Create()
                 .AddSwitch<Type>("PersonType")
+                .FinishBuilding("/PersonType:EmployeePersonType");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed");
+            Assert.IsTrue(_paramObj.GetPropertyValue<Type>("PersonType") == typeof(EmployeePersonType));
+        }
+        [Test]
+        public void Test_TypeTypeParser_SwitchValueList_FriendName_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType", "PersonType", true, -1, "Employee", "Customer")
+                .FinishBuilding("/PersonType:Employee");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed");
+            Assert.IsTrue(_paramObj.GetPropertyValue<Type>("PersonType") == typeof(EmployeePersonType));
+        }
+        [Test]
+        public void Test_TypeTypeParser_SwitchValueList_FriendName_Bad()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType", "PersonType", true, -1, "Employee", "Customer")
+                .FinishBuilding("/PersonType:Boss");
+
+            ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed", true);
+        }
+        [Test]
+        public void Test_TypeTypeParser_SwitchValueList_ClassName_Good()
+        {
+            ParamsObject _paramObj = DynamicParamsCreator
+                .Create()
+                .AddSwitch<Type>("PersonType", "PersonType", true, -1, "Employee", "Customer")
                 .FinishBuilding("/PersonType:EmployeePersonType");
 
             ParamsObjectTestHelpers.AssertCheckParams(_paramObj, "PersonType parsing failed");

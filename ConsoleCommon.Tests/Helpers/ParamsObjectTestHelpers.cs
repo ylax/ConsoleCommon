@@ -31,10 +31,14 @@ namespace ConsoleCommon.Tests.Helpers
                 }
             }
 
-            Assert.IsTrue((shouldFail &&
-                (_hasExpctdErr && _ex != null && removePeriod(_ex.Message).ToLower().Trim() == removePeriod(expctdErrMsg).ToLower().Trim()) ||
-                (!_hasExpctdErr && _ex != null)
-                ) || (!shouldFail && _ex == null), _errMsg);
+            bool _failure = (shouldFail &&
+                ((_hasExpctdErr && _ex != null && removePeriod(_ex.Message).ToLower().Trim() != removePeriod(expctdErrMsg).ToLower().Trim()) ||
+                (!_hasExpctdErr && _ex == null))
+                ) || (!shouldFail && _ex!=null);
+            if (_failure)
+            {
+                throw new Exception(_errMsg);
+            }
             return _ex;
         }
         private static string removePeriod(string text)
